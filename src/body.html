@@ -1,0 +1,164 @@
+<div id="app">
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div id="ytBox" aria-hidden="true"><div id="yt"></div></div>
+
+  <div id="hud">
+    <header class="topbar" id="topbar">
+      <div class="station sticker" id="station" data-interactive>
+        <div class="logo" aria-label="GRIND FM"><span>GRIND</span><b>//</b><span>FM</span></div>
+        <div class="station-meta">
+          <span class="led-box"><span class="led" id="freq">20.24</span></span><span class="unit">MHz</span>
+          <span class="onair" id="onair"><i></i>ON AIR</span>
+        </div>
+        <div class="dial" aria-hidden="true"><div class="scale"></div><div class="needle" id="needle"></div></div>
+        <div class="station-sub">PIRATE RADIO · 東京 2024</div>
+        <span class="holo" aria-hidden="true">FM</span>
+      </div>
+      <nav class="tools" aria-label="Options">
+        <button class="chip" id="btnSync" type="button" aria-haspopup="dialog" title="Synchroniser les visuels sur le son (S)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4.5 13.5h6.2L9.5 22l10-12.6h-6.4L13.5 2z" fill="currentColor"/></svg>
+          <span class="lbl">SYNC</span><b id="modeTag">AUTO</b>
+        </button>
+        <button class="chip" id="btnTracks" type="button" aria-expanded="false" aria-controls="tracklist" title="Tracklist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h2.5M9 6h11M4 12h2.5M9 12h11M4 18h2.5M9 18h11" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg>
+          <span class="lbl">TRACKS</span>
+        </button>
+        <button class="chip icon" id="btnSfx" type="button" aria-pressed="true" title="Effets sonores de l'interface">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+          <span class="lbl">SFX</span>
+        </button>
+        <button class="chip icon" id="btnFs" type="button" title="Plein écran (F)" aria-label="Plein écran">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        </button>
+        <button class="chip icon" id="btnHelp" type="button" title="Commandes (?)" aria-label="Commandes et raccourcis" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9.2a3 3 0 1 1 4.6 2.5c-.9.6-1.6 1.2-1.6 2.3v.6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/><circle cx="12" cy="18.6" r="1.6" fill="currentColor"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <button id="discHit" class="disc-hit" type="button" aria-label="Lire la radio"></button>
+
+    <div id="cta" class="cta sticker" aria-hidden="true">CLIQUE LE DISQUE&nbsp;!
+      <svg viewBox="0 0 96 70" aria-hidden="true"><path d="M86 6C70 10 58 18 48 32 40 43 30 52 12 58" stroke="#0E0E10" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M8 47 10 62 25 59" stroke="#0E0E10" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <div id="status" class="status-pill" role="status" aria-live="polite">TUNING…</div>
+
+    <footer class="banner" id="banner">
+      <div class="banner-info">
+        <div class="now">
+          <span class="tag-now">NOW ON AIR</span>
+          <span class="mode-chip led-box"><span class="led" id="modeChip">AUTO</span></span>
+          <div class="discs" id="discs" role="radiogroup" aria-label="Changer de disque" data-interactive></div>
+        </div>
+        <h1 class="title" id="tTitle" aria-live="polite">GRIND//FM</h1>
+        <div class="meta">
+          <span class="artist" id="tArtist">Clique le disque pour lancer la radio</span>
+          <span class="led-box"><span class="led" id="tNum">TR --/--</span></span>
+          <span class="led-box"><span class="led" id="tTime">0:00 / 0:00</span></span>
+        </div>
+        <div class="progress" id="progress" role="slider" tabindex="0" aria-label="Position dans la piste" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0:00">
+          <div class="track"></div><div class="fill" id="pFill"></div><div class="cap" id="pCap"></div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="round" id="btnPrev" type="button" aria-label="Piste précédente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 5h2.8v14H5.5zM20 5.2v13.6L9.5 12z" fill="currentColor"/></svg>
+        </button>
+        <button class="round big" id="btnPlay" type="button" aria-label="Lire">
+          <svg viewBox="0 0 24 24" aria-hidden="true" id="icoPlay"><path d="M7.5 4.5v15l12.5-7.5z" fill="currentColor"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" id="icoPause" hidden><path d="M6 4.5h4.4v15H6zM13.6 4.5H18v15h-4.4z" fill="currentColor"/></svg>
+        </button>
+        <button class="round" id="btnNext" type="button" aria-label="Piste suivante">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.7 5h2.8v14h-2.8zM4 5.2v13.6L14.5 12z" fill="currentColor"/></svg>
+        </button>
+        <div class="knob" id="knob" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" data-interactive>
+          <div class="knob-face"><i></i></div>
+          <span class="led-box"><span class="led" id="volLed">80</span></span>
+        </div>
+      </div>
+    </footer>
+
+    <aside id="tracklist" class="panel" aria-label="Tracklist" hidden>
+      <div class="panel-head">
+        <h2>TRACKLIST</h2>
+        <p id="plName">Jet Set Radio — The Complete Soundtrack</p>
+        <button class="close" id="btnCloseTracks" type="button" aria-label="Fermer la tracklist">×</button>
+        <div class="disc-tabs" id="discTabs" role="radiogroup" aria-label="Disque"></div>
+      </div>
+      <ol id="tracks"></ol>
+    </aside>
+
+    <div id="card" class="card" aria-hidden="true">
+      <div class="card-kicker" id="cardKicker">TRACK</div>
+      <div class="card-num" id="cardNum">01</div>
+      <div class="card-title" id="cardTitle"></div>
+    </div>
+    <div id="interlude" class="interlude" aria-hidden="true"></div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <div id="demo" class="demo sticker" hidden>MODE DÉMO · SANS SON<small id="demoWhy"></small></div>
+
+    <div id="syncModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="syncTitle" hidden>
+      <div class="modal-card">
+        <button class="close" type="button" data-close aria-label="Fermer">×</button>
+        <h2 id="syncTitle">SYNC LE SON</h2>
+        <p>Le son vient d'un lecteur YouTube que la page ne peut pas écouter directement. Pour que les visuels suivent vraiment la musique, partage l'audio de cet onglet&nbsp;: choisis cet onglet et active «&nbsp;Partager l'audio de l'onglet&nbsp;».</p>
+        <p class="small">Rien n'est enregistré ni envoyé&nbsp;: l'audio est analysé en direct dans ton navigateur. Le micro écoute tes haut-parleurs, utile sur téléphone, Firefox ou Safari. En AUTO, les visuels suivent un tempo simulé (touche T pour le caler à l'oreille).</p>
+        <div class="modal-actions">
+          <button class="chip primary" type="button" id="btnLive">PARTAGER L'ONGLET</button>
+          <button class="chip" type="button" id="btnMic">UTILISER LE MICRO</button>
+          <button class="chip" type="button" id="btnAuto">RESTER EN AUTO</button>
+        </div>
+        <p class="small" id="syncNote" hidden></p>
+      </div>
+    </div>
+
+    <div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
+      <div class="modal-card">
+        <button class="close" type="button" data-close aria-label="Fermer">×</button>
+        <h2 id="helpTitle">COMMANDES</h2>
+        <div class="keys">
+          <kbd>Clic disque</kbd><span>Lecture / pause</span>
+          <kbd>Glisser</kbd><span>Faire tourner le disque</span>
+          <kbd>Molette</kbd><span>Volume (au-dessus du disque)</span>
+          <kbd>Clic décor</kbd><span>Un coup de bombe sur le décor</span>
+          <kbd>Espace</kbd><span>Lecture / pause</span>
+          <kbd>C</kbd><span>Changer de disque</span>
+          <kbd>1 2</kbd><span>Choisir le disque (Jet Set Radio, Jet Set Radio Future)</span>
+          <kbd>← →</kbd><span>Piste précédente / suivante</span>
+          <kbd>↑ ↓</kbd><span>Volume</span>
+          <kbd>M</kbd><span>Couper le son</span>
+          <kbd>L</kbd><span>Label blanc ou argent</span>
+          <kbd>T</kbd><span>Tap tempo (mode AUTO)</span>
+          <kbd>S</kbd><span>Sync son</span>
+          <kbd>F</kbd><span>Plein écran</span>
+          <kbd>D</kbd><span>Réglages fins</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="tv" class="tv" hidden>
+      <div class="tv-screen" id="tvScreen"></div>
+      <div class="tv-label">TAP TO TUNE IN<small>Touche l'écran une fois pour lancer le son</small></div>
+    </div>
+
+    <div id="intro" class="intro" aria-hidden="true">
+      <div class="intro-logo">GRIND<b>//</b>FM</div>
+      <div class="intro-dial"><div class="scale"></div><div class="needle"></div></div>
+      <div class="intro-text" id="introText">TUNING 20.24…</div>
+    </div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="boil" x="-5%" y="-10%" width="110%" height="120%">
+        <feTurbulence id="boilNoise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="spray" x="-2%" y="-60%" width="104%" height="220%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+</div>

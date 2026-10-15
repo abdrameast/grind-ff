@@ -1,0 +1,12 @@
+{
+  "name": "grind-ff-tests",
+  "private": true,
+  "description": "Local copies of the CDN dependencies used by the headless test harness (harness.py).",
+  "dependencies": {
+    "@fontsource/bungee": "5.3.0",
+    "@fontsource/dela-gothic-one": "5.3.0",
+    "@fontsource/dotgothic16": "5.3.1",
+    "lil-gui": "0.19.2",
+    "three": "0.170.0"
+  }
+}

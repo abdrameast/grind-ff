@@ -1,0 +1,7 @@
+node_modules/
+__pycache__/
+build/out/
+build/_check.mjs
+dist/
+test/shots/
+.DS_Store
